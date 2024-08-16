@@ -1,6 +1,5 @@
 // src/components/PostList.js
 import React, { useState, useEffect } from 'react';
-import { postList } from '../postsData';
 import { 
   PostListWrapper, 
   PostTitleWrapper, 
@@ -12,10 +11,10 @@ import {
   AddPostButton, 
   SearchInputWrapper, 
   SearchInput,
-  SearchIconWrapper, // 추가된 부분
+  SearchIconWrapper,
   SearchIcon
 } from './styles/PostListStyles';
-import searchIcon from '../assets/images/search.png'; // 이미지 경로를 적절히 수정하세요
+import searchIcon from '../assets/images/search.png';
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
@@ -23,8 +22,22 @@ const PostList = () => {
   const [filteredPosts, setFilteredPosts] = useState([]);
 
   useEffect(() => {
-    setPosts([...postList]); // postList가 변경될 때마다 상태를 업데이트
-    setFilteredPosts([...postList]); // 초기 상태로 모든 포스트를 표시
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/posts");
+        if (!response.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+        const data = await response.json();
+        console.log("Fetched data:", data); // 데이터를 로그로 확인
+        setPosts(data); 
+        setFilteredPosts(data); 
+      } catch (error) {
+        console.error("오류:", error);
+      }
+    };
+  
+    fetchPosts(); 
   }, []);
 
   const handleSearch = () => {

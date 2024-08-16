@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { addPost, postList } from '../postsData';
 import {
   AddPostWrapper,
   AddPostHeader,
@@ -16,18 +15,35 @@ const AddPost = () => {
   const [content, setContent] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
     const newPost = {
-      id: postList.length ? postList[postList.length - 1].id + 1 : 1, // 기존 게시물이 없을 때 id를 1로 설정
-      title,
-      content,
-      comments: []
+      title: title.trim(),
+      content: content.trim(),
+      comments: []  // 초기 댓글 배열을 설정
     };
-    addPost(newPost);
-    navigate('/');
+    
+    try {
+      const response = await fetch("http://127.0.0.1:8000/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newPost),
+      });
+    
+      if (!response.ok) {
+        throw new Error("Failed to add post");
+      }
+    
+      console.log("Post added successfully");
+      navigate('/');  // 게시물이 성공적으로 추가되면 메인 페이지로 이동
+    } catch (error) {
+      console.error("Error adding post:", error);
+    }
   };
-
+  
   return (
     <AddPostWrapper>
       <AddPostHeader>
